@@ -1,0 +1,72 @@
+public class DaoFactura extends Conexion{
+     public boolean guardarFactura(Factura factura) {
+        String consulta = "insert into factura (codigo,cliente,vendedor,total,totalIva,fecha,direccionEnvio,estado) "
+                + "values"
+                + "('"+ factura.getCodigo()+ "','" + factura.getCliente()+ "','"+ factura.getVendedor()+ "','"
+                + factura.getTotal()+ "','"
+                + factura.getTotalIva()+ "','" + factura.getFecha()+ "','" 
+                + factura.getDireccionEnvio()+ "','" + factura.getEstado()+ "');";
+        System.out.println(consulta);
+        return super.ejecutar(consulta);
+    }
+    
+    public Factura buscarFactura(int codigo) {
+        String consulta = "select codigo,cliente,vendedor,total,totalIva,fecha,direccionEnvio,estado from factura "
+                + "where codigo='" + codigo + "'";
+        Factura fa = new Factura();
+        super.ejecutarRetorno(consulta);
+        try {
+            if (resultadoDB.next()) {
+                fa.setCodigo(resultadoDB.getInt("codigo"));
+                fa.setCliente(resultadoDB.getInt("clinete"));
+                fa.setVendedor(resultadoDB.getInt("vendedor"));
+                fa.setTotal(resultadoDB.getDouble("total"));
+                fa.setTotalIva(resultadoDB.getDouble("totalIva"));
+                fa.setFecha(resultadoDB.getString("fecha"));
+                fa.setDireccionEnvio(resultadoDB.getString("direccionEnvio"));
+                fa.setEstado(resultadoDB.getInt("estado"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Esto se Tosto");
+        }
+        return fa;
+    }
+    
+    public boolean modificarCliente(Cliente cliente) {
+        String consulta = "update cliente set nombre='" + cliente.getNombre()
+                + "',apellido='" + cliente.getApellido()
+                + "',correo='" + cliente.getCorreo()
+                + "',telefono='" + cliente.getCelular()
+                + "',direccion='" + cliente.getDireccion()
+                + "' where cedula=" + cliente.getCedula();
+        return super.ejecutar(consulta);
+    }
+    
+    public boolean eliminarClinete(int cedula) {
+        String consulta = "delete from cliente where cedula=" + cedula;
+        return super.ejecutar(consulta);
+    }
+    
+     public ArrayList<Cliente> listar() {
+        ArrayList<Cliente> lista = new ArrayList<>();
+        String consulta = "select cedula,nombre,apellido,correo,telefono,direccion from cliente ";
+        super.ejecutarRetorno(consulta);
+        try {
+            while (resultadoDB.next()) {
+                Cliente cli = new Cliente();
+                cli.setCedula(resultadoDB.getInt("cedula"));
+                cli.setNombre(resultadoDB.getString("nombre"));
+                cli.setApellido(resultadoDB.getString("apellido"));
+                cli.setCorreo(resultadoDB.getString("correo"));
+                cli.setCelular(resultadoDB.getInt("telefono"));
+                cli.setDireccion(resultadoDB.getString("direccion"));
+                lista.add(cli);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return null;
+        }
+        return lista;
+    }
+    
+}
