@@ -1,0 +1,22 @@
+ DaoFactura df= new DaoFactura();
+    DAODetalleFactura ddf = new DAODetalleFactura();
+    public boolean crearFactura(int codigo ,int cliente, int vendedor, double total, String fecha, 
+            String direccionEnvio, double totalIva,int estado, ArrayList<DetalleFactura>detalle){
+        estado=1;
+        Factura f = new Factura(codigo,cliente,vendedor,total,fecha,direccionEnvio,totalIva,estado);
+        System.out.println("estoy aqui");
+        if(df.buscarFactura(codigo).getCodigo()==codigo){
+            System.out.println("encontre que la factura no existe");
+            return false;
+        }else{
+            if(df.guardarFactura(f))
+            {
+                System.out.println("soy el detalle");
+                for (int i = 0;i< detalle.size(); i++) {
+                    ddf.guardarDetalle(detalle.get(i));
+                }
+                return true;
+            }
+        }
+        return false;
+    }
