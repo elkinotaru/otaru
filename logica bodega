@@ -1,0 +1,59 @@
+package logica;
+
+import DAO.BodegaDAO;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import modelo.Bodega;
+
+/**
+ *
+ * @author Drago1
+ */
+public class logicaBodega {
+
+    BodegaDAO daoB = new BodegaDAO();
+
+    public boolean crearBodega(int codigo, String nombre, String direccion, int telefono) {
+        Bodega bodega = new Bodega(codigo, nombre, direccion, telefono);
+        if (daoB.buscarBodega(codigo).getCodigo() == codigo) {
+            return false;
+        } else {
+            if (daoB.guardarBodega(bodega)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public boolean modificar(int codigo, String nombre, String direccion, int telefono) {
+        Bodega bodega = new Bodega(codigo, nombre, direccion, telefono);
+        if (daoB.buscarBodega(codigo).getCodigo() == codigo) {
+            if (daoB.modificarBodega(bodega)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean eliminar(int codigo) {
+        if (daoB.eliminarBodega(codigo)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Bodega buscar(int codigo) {
+        if (daoB.buscarBodega(codigo).getCodigo() == codigo) {
+            return daoB.buscarBodega(codigo);
+        } else {
+            return null;
+        }
+    }
+
+}
