@@ -1,0 +1,151 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package controlador;
+
+import DAO.ClienteDAO;
+import DAO.DAODespachos;
+import DAO.DAODetalleFactura;
+import DAO.DAOProductos;
+import DAO.DAOStock;
+import DAO.DaoFactura;
+import DAO.VendedorDAO;
+import Vista.Productos;
+import java.util.ArrayList;
+import modelo.CategoriaProducto;
+import modelo.Cliente;
+import modelo.Despacho;
+import modelo.DetalleFactura;
+import modelo.Factura;
+import modelo.Producto;
+import modelo.Stock;
+import modelo.Vendedor;
+
+/**
+ *
+ * @author Drago1
+ */
+public class LogicaFactura {
+
+    DAOProductos daoProductos = new DAOProductos();
+    DaoFactura df = new DaoFactura();
+    VendedorDAO vd = new VendedorDAO();
+    ClienteDAO cd = new ClienteDAO();
+    DAODetalleFactura ddf = new DAODetalleFactura();
+    DAOStock dstok = new DAOStock();
+    DAODespachos dd = new DAODespachos();
+
+    public boolean crearFactura(int codigo, int cliente, int vendedor, double total, String fecha,
+            String direccionEnvio, double totalIva, int estado, ArrayList<DetalleFactura> detalle) {
+        estado = 1;
+        Factura f = new Factura(codigo, cliente, vendedor, total, fecha, direccionEnvio, totalIva, estado);
+        System.out.println("estoy aqui");
+        if (df.buscarFactura(codigo).getCodigo() == codigo) {
+            System.out.println("encontre que la factura no existe");
+            return false;
+        } else {
+            if (df.guardarFactura(f)) {
+                System.out.println("soy el detalle");
+                for (int i = 0; i < detalle.size(); i++) {
+                    DetalleFactura df = new DetalleFactura(detalle.get(i).getProducto(), f.getCodigo(),
+                            detalle.get(i).getCantidad(), detalle.get(i).getValorUnitario());
+                    ddf.guardarDetalle(df);
+                    Despacho des = new Despacho(codigo,cd.buscarCliente(cliente).getDireccion(),1);
+                    dd.guardarDespachos(des);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<Producto> listarpro() {
+        return daoProductos.listarProducto();
+    }
+    
+    public ArrayList<Stock> listarStock() {
+        return dstok.listarCombo();
+    }
+    
+    public ArrayList<Despacho> listarDespachoEnProceso() {
+        return dd.listarDespacho();
+    }
+
+    public Producto buscarProductos(int codigo) {
+        if (daoProductos.buscarProducto(codigo).getCodigo() == codigo) {
+            return daoProductos.buscarProducto(codigo);
+        } else {
+            return null;
+        }
+    }
+
+    public ArrayList<Vendedor> listarVendedor() {
+        return vd.listar();
+    }
+
+    public Factura buscarFactura(int codigo) {
+        if (df.buscarFactura(codigo).getCodigo() == codigo) {
+            return df.buscarFactura(codigo);
+        } else {
+            return null;
+        }
+    }
+
+    public ArrayList<Factura> listarFactura() {
+        return df.listar();
+    }
+
+    public ArrayList<DetalleFactura> listarDetalle(int codigo) {
+        return ddf.listarDetalle(codigo);
+    }
+
+    public Cliente buscarCliente(int codigo) {
+        if (cd.buscarCliente(codigo).getCedula() == codigo) {
+            return cd.buscarCliente(codigo);
+        } else {
+            return null;
+        }
+    }
+
+    public Vendedor BuscarVendedor(int codigo) {
+        if (vd.buscarVendedor(codigo).getCodigo() == codigo) {
+            return vd.buscarVendedor(codigo);
+        } else {
+            return null;
+        }
+
+    }
+
+    public boolean modificarFactura(int codigo) {
+        Factura factura = new Factura();
+        factura = df.buscarFactura(codigo);
+        if (factura != null) {
+            Factura fMod = new Factura(factura.getCodigo(), factura.getCliente(),
+                    factura.getVendedor(), factura.getTotal(), factura.getFecha(),
+                    factura.getDireccionEnvio(), factura.getTotalIva(), 0);
+            if (df.modificarFactura(fMod)) {
+                Despacho d = new Despacho(codigo,cd.buscarCliente(factura.getCliente()).getDireccion(),3);
+                if(dd.modificarDespacho(d)){
+                return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    boolean confirmarEntrega(int codigo) {
+       if(df.buscarFactura(codigo).getCodigo()==codigo){
+           Despacho d = new Despacho();
+           d=dd.buscarDespacho(codigo);
+           if(d.getFactura()==codigo){
+               Despacho d1= new Despacho(d.getFactura(),d.getDireccion(),2);
+               return dd.modificarDespacho(d1);
+               
+           }
+       }
+       return false;
+    }
+
+}
