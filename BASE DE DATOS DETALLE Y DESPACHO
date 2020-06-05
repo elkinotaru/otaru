@@ -1,0 +1,46 @@
+create table detalleFactura(
+factura int primary key,
+producto int not null,
+cantidad int not null,
+valorUnitario double not null
+);
+
+CREATE TABLE detallefactura (
+    factura         INTEGER NOT NULL,
+    producto        INTEGER NOT NULL,
+    cantidad        INTEGER NOT NULL,
+    valorunitario   double NOT NULL
+);
+
+ALTER TABLE detallefactura
+    ADD CONSTRAINT detallefactura_pk PRIMARY KEY ( factura,
+                                                   producto,
+                                                   cantidad );
+
+
+ALTER TABLE detallefactura
+    ADD CONSTRAINT detallefactura_factura_fk FOREIGN KEY ( factura )
+        REFERENCES factura ( codigo );
+
+ALTER TABLE detallefactura
+    ADD CONSTRAINT detallefactura_productos_fk FOREIGN KEY ( producto )
+        REFERENCES productos ( codigo );
+
+
+CREATE TABLE despacho (
+    factura     INTEGER NOT NULL,
+    direccion   VARCHAR(50) NOT NULL,
+    estado      INTEGER NOT NULL
+);
+
+ALTER TABLE despacho ADD CONSTRAINT despacho_pk PRIMARY KEY ( factura );
+
+CREATE TABLE facturas (
+    codigo INTEGER NOT NULL
+);
+
+ALTER TABLE facturas ADD CONSTRAINT facturas_pk PRIMARY KEY ( codigo );
+
+ALTER TABLE facturas
+    ADD CONSTRAINT facturas_despacho_fk FOREIGN KEY ( codigo )
+        REFERENCES despacho ( factura );
